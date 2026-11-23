@@ -58,8 +58,15 @@ function parseEvent(fd: FormData): Parsed {
   const reward_cap = capRaw ? Number(capRaw) : null;
   if (reward_cap != null && (!Number.isInteger(reward_cap) || reward_cap < 1)) return { error: "El límite de invitaciones debe ser un número entero mayor que 0 o quedar vacío." };
 
+  const videos = str(fd, "videos").split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 6).map((l) => {
+    const [src, poster] = l.split(/\s+/);
+    return { src, poster: poster ?? null };
+  });
+  if (videos.some((v) => !/^https:\/\//i.test(v.src) || (v.poster && !/^https:\/\//i.test(v.poster)))) return { error: "Los vídeos y sus imágenes deben ser direcciones https." };
+
   return {
     values: {
+      videos,
       title,
       promoter: opt(fd, "promoter"),
       starts_at,
@@ -71,7 +78,6 @@ function parseEvent(fd: FormData): Parsed {
       description: opt(fd, "description"),
       artists: opt(fd, "artists"),
       recommendation: opt(fd, "recommendation"),
-      price_text: opt(fd, "price_text"),
       min_age,
       access_conditions: opt(fd, "access_conditions"),
       ticket_url,

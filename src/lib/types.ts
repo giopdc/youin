@@ -27,6 +27,7 @@ export type EventRow = {
   reward_threshold: number;
   reward_cap: number | null;
   genres: string[];
+  videos: { src: string; poster?: string | null }[];
   recommendation: string | null;
   published_at: string | null;
   created_at: string;

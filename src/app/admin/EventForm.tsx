@@ -50,9 +50,11 @@ export function EventForm({ event, action, submitLabel }: { event?: EventRow; ac
         <Field label="Por qué ir (opcional)" hint="Una frase que anime a venir. Sale en la ficha y marca la fiesta como «Recomendada»."><textarea name="recommendation" defaultValue={event?.recommendation ?? ""} maxLength={400} /></Field>
         <Field label="Line-up" hint="Un artista por línea. Para separar por salas, escribe antes una línea que empiece por # con la sala y su horario. Ej.: # La Sala · 20:00 – 04:00"><textarea name="artists" defaultValue={event?.artists ?? ""} /></Field>
         <div className="grid2">
-          <Field label="Precios" hint="Una línea por tipo de entrada, con dos puntos. Ej.: La Sala: 13 € · 16 € · 20 €. Las líneas sin dos puntos salen como nota."><textarea name="price_text" defaultValue={event?.price_text ?? ""} style={{ minHeight: 60 }} /></Field>
           <Field label="Edad mínima"><input type="number" name="min_age" min={0} max={99} inputMode="numeric" defaultValue={event?.min_age ?? ""} /></Field>
         </div>
+        <Field label="Vídeos (opcional)" hint="Uno por línea: dirección del vídeo .mp4 y, si quieres, la de su imagen separada por un espacio. Se reproducen en silencio en la ficha.">
+          <textarea name="videos" defaultValue={(event?.videos ?? []).map((v) => [v.src, v.poster].filter(Boolean).join(" ")).join("\n")} />
+        </Field>
         <Field label="Condiciones de acceso"><textarea name="access_conditions" defaultValue={event?.access_conditions ?? ""} /></Field>
       </fieldset>
 

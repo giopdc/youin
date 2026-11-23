@@ -13,7 +13,7 @@ import { ListJoin } from "@/components/ListJoin";
 import { StickyJoin } from "@/components/StickyJoin";
 import { Confetti } from "@/components/Confetti";
 import { formatEventDate, hasEnded } from "@/lib/time";
-import { invitePresets, inviteText, parsePrices, shareDescription } from "@/lib/event-text";
+import { invitePresets, inviteText, shareDescription } from "@/lib/event-text";
 import { APP_NAME, siteUrl } from "@/config/site";
 import type { EventRow, GuestlistRow, ParticipationSummary, SavedPlan } from "@/lib/types";
 import { joinProgram, savePlan } from "./actions";
@@ -121,7 +121,6 @@ export default async function EventPage({ params, searchParams }: Props) {
     </section>
   ) : null;
 
-  const from = parsePrices(event.price_text).from;
   const actions = ended ? (
     <div className="notice warn">Esta fiesta ya ha terminado. <Link href="/">Mira las próximas</Link>.</div>
   ) : (
@@ -130,7 +129,7 @@ export default async function EventPage({ params, searchParams }: Props) {
       {autoSave && <AutoSavePlan slug={slug} />}
       {event.ticket_url && (
         <a className="btn sun block big" href={event.ticket_url} target="_blank" rel="noopener noreferrer">
-          Comprar entrada{from != null ? ` · desde ${String(from).replace(".", ",")} €` : ""}
+          Comprar entrada en Xceed
         </a>
       )}
       {!request && invite}
@@ -147,7 +146,7 @@ export default async function EventPage({ params, searchParams }: Props) {
         )}
         {event.starts_at && <a className="btn" href={`/eventos/${slug}/calendario`}>Añadir al calendario</a>}
       </div>
-      {event.ticket_url && <p className="small muted" style={{ margin: 0 }}>La entrada se compra en Xceed. Los gastos de gestión se añaden al pagar.</p>}
+      {event.ticket_url && <p className="small muted" style={{ margin: 0 }}>Precios y tipos de entrada, en Xceed.</p>}
     </section>
   );
 

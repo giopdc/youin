@@ -92,3 +92,9 @@ update public.events set genres = '{House,"Tech house",Minimal}' where slug = 'n
 update public.events set genres = '{Techno,House,"Electrónica / Downtempo"}' where slug = 'dias-de-campo-2027';
 -- Confirmadas por Giorgio: Elenco House (+21), Navidance, NYE y Días de Campo. Reyes y Reinas sigue en borrador.
 update public.events set status = 'draft' where slug = 'reyes-y-reinas-5-enero';
+
+-- Vídeos de ediciones anteriores de Elenco (subidos al bucket «posters»).
+update public.events set videos = '[
+  {"src": "https://aevhkomvofugshuvrngc.supabase.co/storage/v1/object/public/posters/elenco-house-7-diciembre/hype/elenco-confeti.mp4", "poster": "https://aevhkomvofugshuvrngc.supabase.co/storage/v1/object/public/posters/elenco-house-7-diciembre/hype/elenco-confeti.jpg"},
+  {"src": "https://aevhkomvofugshuvrngc.supabase.co/storage/v1/object/public/posters/elenco-house-7-diciembre/hype/elenco-cabina.mp4", "poster": "https://aevhkomvofugshuvrngc.supabase.co/storage/v1/object/public/posters/elenco-house-7-diciembre/hype/elenco-cabina.jpg"}
+]'::jsonb where slug = 'elenco-house-7-diciembre';
