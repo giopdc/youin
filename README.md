@@ -76,7 +76,19 @@ web. Nadie puede hacerse administrador editando su perfil.
 Un clic en un enlace nunca suma ventas. La app no se conecta a Xceed ni necesita credenciales de Xceed:
 solo guarda y valida destinos `https://…xceed.me/…`.
 
-## 4. Comprobaciones
+## 4. Publicación (Cloudflare Workers)
+
+Web publicada: https://you-in.ciaterbox.workers.dev
+
+- `.env.production` lleva la URL y la clave pública de Supabase y la URL pública (no son secretos).
+- `npm run deploy`: despliegue estándar con OpenNext (sube los estáticos como *static assets*).
+- `npm run deploy:direct`: alternativa que incrusta los estáticos en el worker, para entornos
+  donde la subida de *static assets* falla (como las sesiones en la nube de Claude Code).
+- Recomendado: en Cloudflare → Workers → `you-in` → Settings → Builds, conecta este repositorio
+  con *Build command* `npx opennextjs-cloudflare build` y *Deploy command* `npx opennextjs-cloudflare deploy`,
+  para que cada push a `main` se publique solo.
+
+## 5. Comprobaciones
 
 ```bash
 npm run lint        # TypeScript
