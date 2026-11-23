@@ -13,7 +13,7 @@ import { ListJoin } from "@/components/ListJoin";
 import { StickyJoin } from "@/components/StickyJoin";
 import { Confetti } from "@/components/Confetti";
 import { formatEventDate, hasEnded } from "@/lib/time";
-import { invitePresets, inviteText, shareDescription } from "@/lib/event-text";
+import { invitePresets, inviteText, parsePrices, shareDescription } from "@/lib/event-text";
 import { APP_NAME, siteUrl } from "@/config/site";
 import type { EventRow, GuestlistRow, ParticipationSummary, SavedPlan } from "@/lib/types";
 import { joinProgram, savePlan } from "./actions";
@@ -121,12 +121,18 @@ export default async function EventPage({ params, searchParams }: Props) {
     </section>
   ) : null;
 
+  const from = parsePrices(event.price_text).from;
   const actions = ended ? (
     <div className="notice warn">Esta fiesta ya ha terminado. <Link href="/">Mira las próximas</Link>.</div>
   ) : (
     <section className="card plan" id="plan" aria-labelledby="tu-plan">
-      <h2 id="tu-plan">Tu plan</h2>
+      <h2 id="tu-plan" className="block-title">Tu plan</h2>
       {autoSave && <AutoSavePlan slug={slug} />}
+      {event.ticket_url && (
+        <a className="btn sun block big" href={event.ticket_url} target="_blank" rel="noopener noreferrer">
+          Comprar entrada{from != null ? ` · desde ${String(from).replace(".", ",")} €` : ""}
+        </a>
+      )}
       {!request && invite}
       <div className="row">
         {plan ? (
@@ -139,44 +145,50 @@ export default async function EventPage({ params, searchParams }: Props) {
         ) : (
           <Link className="btn" href={signup("guardar")}>Guardar plan</Link>
         )}
-        {event.ticket_url && <a className="btn sun" href={event.ticket_url} target="_blank" rel="noopener noreferrer">Comprar entrada</a>}
-        {event.starts_at && <a className="btn" href={`/eventos/${slug}/calendario`}>Calendario</a>}
+        {event.starts_at && <a className="btn" href={`/eventos/${slug}/calendario`}>Añadir al calendario</a>}
       </div>
-      {event.ticket_url && <p className="small muted" style={{ margin: 0 }}>La entrada se compra en Xceed.</p>}
+      {event.ticket_url && <p className="small muted" style={{ margin: 0 }}>La entrada se compra en Xceed. Los gastos de gestión se añaden al pagar.</p>}
     </section>
   );
 
-  const extra = !ended && event.rewards_enabled ? (
-    <section className="card promo" id="programa" aria-labelledby="h-programa">
-      <p className="kicker">Programa de promotores · opcional</p>
-      <h2 id="h-programa">Vende entradas y gana una invitación</h2>
-      <p className="small">
-        Por cada {event.reward_threshold} entradas válidas vendidas con tu enlace personal consigues 1 invitación
-        {event.reward_cap ? ` (máximo ${event.reward_cap} por persona)` : ""}.
-      </p>
-      <p className="small muted">No es lo mismo que invitar a un amigo: este enlace es solo tuyo y sirve para que Xceed cuente tus ventas.</p>
-      {event.rewards_conditions && <p className="small pre muted">{event.rewards_conditions}</p>}
-      {part ? (
-        <Link className="btn block" href={`/perfil#e-${slug}`}>
-          {part.status === "pending" ? "Solicitud recibida · ver mi panel" : "Ver mi enlace y mis ventas"}
-        </Link>
-      ) : !event.rewards_open ? (
-        <p className="muted">El programa está cerrado.</p>
-      ) : user ? (
-        <form action={joinProgram}>
-          <input type="hidden" name="slug" value={slug} />
-          <SubmitButton className="btn block" pendingText="Enviando…">Quiero compartir y ganar una invitación</SubmitButton>
-        </form>
-      ) : (
-        <Link className="btn block" href={signup()}>Quiero compartir y ganar una invitación</Link>
-      )}
+  const program = !ended && event.rewards_enabled ? (
+    <section className="promo-card" id="programa" aria-labelledby="h-programa">
+      <div className="promo-rule" aria-hidden="true">
+        <span><b>{event.reward_threshold}</b>entradas vendidas</span>
+        <i>=</i>
+        <span><b>1</b>invitación gratis</span>
+      </div>
+      <div className="promo-body">
+        <p className="kicker">Comparte y gana</p>
+        <h2 id="h-programa">Vende entradas a tu gente y entra gratis</h2>
+        <p className="small">
+          Te damos tu enlace personal de Xceed. Por cada {event.reward_threshold} entradas que se vendan con él, consigues 1 invitación
+          {event.reward_cap ? ` (hasta ${event.reward_cap})` : ""}.
+        </p>
+        {event.rewards_conditions && <p className="small pre muted">{event.rewards_conditions}</p>}
+        {part ? (
+          <Link className="btn primary block" href={`/perfil#e-${slug}`}>
+            {part.status === "pending" ? "Solicitud recibida · ver mi panel" : "Ver mi enlace y mis ventas"}
+          </Link>
+        ) : !event.rewards_open ? (
+          <p className="muted" style={{ margin: 0 }}>El programa está cerrado.</p>
+        ) : user ? (
+          <form action={joinProgram}>
+            <input type="hidden" name="slug" value={slug} />
+            <SubmitButton className="btn primary block" pendingText="Enviando…">Quiero mi enlace y ganar invitaciones</SubmitButton>
+          </form>
+        ) : (
+          <Link className="btn primary block" href={signup()}>Quiero mi enlace y ganar invitaciones</Link>
+        )}
+        <p className="tiny muted">Es distinto de «¿Te vienes?»: este enlace es solo tuyo y sirve para contar tus ventas.</p>
+      </div>
     </section>
   ) : null;
 
   return (
     <div className="wrap wide">
       <Flash msg={sp.msg} err={sp.err} />
-      <EventDetail event={event} top={top} actions={actions} extra={extra} />
+      <EventDetail event={event} top={top} program={program} actions={actions} />
       {listOpen && !request && <StickyJoin perk={event.guestlist_perk} count={count} />}
     </div>
   );

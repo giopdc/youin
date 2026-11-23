@@ -48,9 +48,9 @@ export function EventForm({ event, action, submitLabel }: { event?: EventRow; ac
         <Field label="…o dirección del cartel (https)"><input type="url" name="poster_url" defaultValue={event?.poster_url ?? ""} /></Field>
         <Field label="Descripción"><textarea name="description" defaultValue={event?.description ?? ""} /></Field>
         <Field label="Por qué ir (opcional)" hint="Una frase que anime a venir. Sale en la ficha y marca la fiesta como «Recomendada»."><textarea name="recommendation" defaultValue={event?.recommendation ?? ""} maxLength={400} /></Field>
-        <Field label="Artistas" hint="Uno por línea."><textarea name="artists" defaultValue={event?.artists ?? ""} /></Field>
+        <Field label="Line-up" hint="Un artista por línea. Para separar por salas, escribe antes una línea que empiece por # con la sala y su horario. Ej.: # La Sala · 20:00 – 04:00"><textarea name="artists" defaultValue={event?.artists ?? ""} /></Field>
         <div className="grid2">
-          <Field label="Precio o texto de precios"><textarea name="price_text" defaultValue={event?.price_text ?? ""} style={{ minHeight: 60 }} /></Field>
+          <Field label="Precios" hint="Una línea por tipo de entrada, con dos puntos. Ej.: La Sala: 13 € · 16 € · 20 €. Las líneas sin dos puntos salen como nota."><textarea name="price_text" defaultValue={event?.price_text ?? ""} style={{ minHeight: 60 }} /></Field>
           <Field label="Edad mínima"><input type="number" name="min_age" min={0} max={99} inputMode="numeric" defaultValue={event?.min_age ?? ""} /></Field>
         </div>
         <Field label="Condiciones de acceso"><textarea name="access_conditions" defaultValue={event?.access_conditions ?? ""} /></Field>

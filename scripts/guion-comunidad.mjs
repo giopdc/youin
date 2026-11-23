@@ -41,15 +41,14 @@ const main = () => page.locator("main").innerText();
 // ---------------------------------------------------------------- 1. Ficha desde un mensaje, sin cuenta
 await page.goto(`${BASE}/eventos/${SLUG}`, { waitUntil: "networkidle" });
 await shot("1-ficha-sin-cuenta");
-const music = page.getByRole("heading", { name: "Qué suena" });
-ok(await music.isVisible(), "1. la ficha muestra «Qué suena»");
-const musicBox = await page.locator(".music").boundingBox();
-ok((await page.locator(".genres li").count()) > 0 && (await page.locator(".lineup li").count()) > 0, "1. estilos y line-up visibles sin registrarse");
-ok(/\d{1,2}:\d{2}/.test(await page.locator(".when-big").innerText()), "1. se ve cuándo empieza");
+const music = page.getByRole("heading", { name: "Line-up" });
+ok(await music.isVisible(), "1. la ficha muestra el line-up");
+const musicBox = await page.locator(".lineup-block").boundingBox();
+ok((await page.locator(".lineup li").count()) > 0, "1. line-up visible sin registrarse");
+ok(/\d{1,2}:\d{2}/.test(await page.locator(".facts-row").innerText()), "1. se ve cuándo empieza");
 ok((await page.locator(".ficha header").innerText()).length > 0 && (await main()).includes("Palau Alameda") || !SLUG.startsWith("elenco"), "1. se ve dónde es");
-note(`1. «Qué suena» empieza a ${Math.round(musicBox.y)} px del borde superior (pantalla de 844 px).`);
-if (!(await page.locator(".facts").innerText().catch(() => "")).match(/€/)) note("1. Falta el precio en la ficha.");
-else note("1. El precio está, pero abajo en «Antes de ir»: en la tarjeta de portada no aparece «desde X €».");
+note(`1. El line-up empieza a ${Math.round(musicBox.y)} px del borde superior (pantalla de 844 px).`);
+note((await page.locator(".prices").count()) ? "1. Precios en tabla y «desde X €» en el botón de compra." : "1. Esta fiesta no tiene precios.");
 
 // ---------------------------------------------------------------- 2. Guardar plan → registro/acceso → volver
 await page.getByRole("link", { name: "Guardar plan" }).click();

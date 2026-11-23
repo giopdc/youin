@@ -1,8 +1,52 @@
 import type { EventRow } from "@/lib/types";
 import { formatEventDate } from "@/lib/time";
 
+const lines = (t: string | null) => (t ?? "").split("\n").map((a) => a.trim()).filter(Boolean);
+
+/** Solo artistas (sin las líneas de sala que empiezan por #). */
 export function artistList(e: Pick<EventRow, "artists">): string[] {
-  return (e.artists ?? "").split("\n").map((a) => a.trim()).filter(Boolean);
+  return lines(e.artists).filter((l) => !l.startsWith("#"));
+}
+
+export type Stage = { name: string | null; time: string | null; artists: string[] };
+
+/** Line-up por salas: una línea «# Sala · 20:00 – 04:00» abre una sala; el resto son artistas. */
+export function lineupByStage(e: Pick<EventRow, "artists">): Stage[] {
+  const out: Stage[] = [];
+  for (const l of lines(e.artists)) {
+    if (l.startsWith("#")) {
+      const [name, ...rest] = l.replace(/^#+\s*/, "").split(" · ");
+      out.push({ name: name.trim() || null, time: rest.join(" · ").trim() || null, artists: [] });
+    } else {
+      if (!out.length) out.push({ name: null, time: null, artists: [] });
+      out[out.length - 1].artists.push(l);
+    }
+  }
+  return out.filter((s) => s.artists.length || s.name);
+}
+
+export type Prices = { rows: { label: string; value: string }[]; notes: string[]; from: number | null };
+
+/** Precios: cada línea «Concepto: valor» es una fila; el resto, notas. «from» es el precio más bajo de las entradas. */
+export function parsePrices(text: string | null): Prices {
+  const rows: Prices["rows"] = [];
+  const notes: string[] = [];
+  let from: number | null = null;
+  for (const l of lines(text)) {
+    const i = l.indexOf(":");
+    if (i > 0 && /\d/.test(l.slice(i))) {
+      const label = l.slice(0, i).trim();
+      const value = l.slice(i + 1).trim();
+      rows.push({ label, value });
+      if (!/reservado|botella|mesa|vip/i.test(label)) {
+        for (const m of value.matchAll(/(\d+(?:[.,]\d+)?)\s*€/g)) {
+          const n = Number(m[1].replace(",", "."));
+          if (from === null || n < from) from = n;
+        }
+      }
+    } else notes.push(l);
+  }
+  return { rows, notes, from };
 }
 
 /** «A, B, C y 3 más» (máximo n nombres). */
