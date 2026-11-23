@@ -10,9 +10,9 @@
     "test": "vitest run",
     "test:db": "bash supabase/tests/run_local.sh",
     "verify:story": "node --experimental-strip-types scripts/verify-story.mts",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "opennextjs-cloudflare build && node scripts/cf-patch-cookie.mjs && opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy:direct": "opennextjs-cloudflare build && node scripts/cf-embed-assets.mjs && wrangler deploy -c wrangler.direct.jsonc"
+    "deploy:direct": "opennextjs-cloudflare build && node scripts/cf-patch-cookie.mjs && node scripts/cf-embed-assets.mjs && wrangler deploy -c wrangler.direct.jsonc"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
