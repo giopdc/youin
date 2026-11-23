@@ -26,20 +26,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
     <div className="wrap wide">
       <Flash msg={sp.msg} err={sp.err} />
       <section className="hero">
-        <p className="kicker">Electrónica en Valencia</p>
-        <h1>Encuentra tu sesión y pregunta: ¿te vienes?</h1>
-        <p>Fiestas elegidas por Gio. Mira qué suena, guarda el plan y mándaselo a quien quieras.</p>
+        <span className="sticker">¿you in?</span>
+        <h1>Tu próxima noche, <span className="accent">seleccionada</span>.</h1>
+        <p>La agenda de música electrónica de Valencia que recomienda Gio. Mira qué suena, guarda tu plan y pregunta a quien quieras si se viene.</p>
       </section>
 
       {upcoming.length === 0 ? (
         <div className="card empty">
           <p className="big">Pronto anunciaremos los próximos eventos</p>
-          <p className="muted">Vuelve en unos días: aquí aparecerán las fiestas que Gio recomienda.</p>
+          <p className="muted">Estamos seleccionando las próximas noches. Vuelve en unos días.</p>
         </div>
       ) : (
         <>
           <ul className="paths" aria-label="Por dónde empezar">
-            <li><strong>¿Primera vez?</strong> Empieza por lo que recomienda Gio.</li>
+            <li><strong>¿Primera vez?</strong> Empieza por las fiestas que recomienda Gio.</li>
             <li><strong>¿Ya conoces la escena?</strong> Filtra por el sonido que buscas.</li>
             <li><strong>¿Vas con gente?</strong> En cada fiesta, «¿Te vienes?» se la manda a quien quieras.</li>
           </ul>

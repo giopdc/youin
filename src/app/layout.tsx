@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: APP_TAGLINE,
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#5b2bd9" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#f6f3ee" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { user, isAdmin } = await getSession();
@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a className="skip" href="#contenido">Saltar al contenido</a>
         <header className="site">
           <div className="wrap wide">
-            <Link href="/" className="brand">{APP_NAME}</Link>
+            <Link href="/" className="brand" aria-label={`${APP_NAME}, inicio`}>{APP_NAME}<span className="dot" aria-hidden="true" /></Link>
             <nav aria-label="Principal">
               <Link href="/">Fiestas</Link>
               {user ? (

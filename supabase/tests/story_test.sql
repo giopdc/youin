@@ -283,4 +283,19 @@ set role authenticated;
 select t.throws($$select public.save_plan((select id from public.events where slug = 'elenco-borrador'))$$, 'no está disponible', 'no se guarda un borrador');
 reset role;
 
+
+-- ---------------------------------------------------------------- Ventas por perfil
+select t.as_user('giorgio@example.com');
+set role authenticated;
+select t.ok((select count(*) from public.promoter_totals) = 2, 'el admin ve el total de cada perfil');
+select t.ok((select confirmed_tickets from public.promoter_totals where user_id = (select id from public.profiles where full_name = 'Ana')) = 5, 'total de Ana: 5 entradas');
+reset role;
+select t.as_user('pablo@example.com');
+set role authenticated;
+select t.ok((select count(*) from public.promoter_totals) = 1, 'Pablo solo ve su propio total');
+reset role;
+set role anon;
+select t.throws('select * from public.promoter_totals', 'permission denied', 'sin cuenta no se ven totales');
+reset role;
+
 \echo 'TODAS LAS COMPROBACIONES DE BASE DE DATOS PASARON'

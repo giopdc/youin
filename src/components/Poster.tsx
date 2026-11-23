@@ -5,7 +5,7 @@ export function Poster({ event, size = "card" }: { event: Pick<EventRow, "poster
   if (event.poster_url) {
     return <img className={size === "hero" ? "poster" : "thumb"} src={event.poster_url} alt={size === "hero" ? `Cartel de ${event.title}` : ""} loading={size === "hero" ? "eager" : "lazy"} />;
   }
-  const label = event.genres?.[0] ?? "Música electrónica";
+  const label = event.genres?.[0] ?? "electrónica";
   return (
     <div className={`${size === "hero" ? "poster" : "thumb"} poster-fallback`} role={size === "hero" ? "img" : undefined} aria-label={size === "hero" ? `${event.title}: sin cartel todavía` : undefined}>
       <span>{label}</span>

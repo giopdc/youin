@@ -21,6 +21,10 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
   return (
     <div className="wrap">
       <Flash msg={sp.msg} err={sp.err} />
+      <nav className="tabs" aria-label="Administración">
+        <Link href="/admin" aria-current="page">Fiestas</Link>
+        <Link href="/admin/promotores">Ventas por perfil</Link>
+      </nav>
       <div className="row" style={{ justifyContent: "space-between" }}>
         <h1 style={{ margin: 0 }}>Administración</h1>
         <Link className="btn primary" href="/admin/eventos/nuevo">Nuevo evento</Link>

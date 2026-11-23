@@ -1,15 +1,19 @@
 import Link from "next/link";
 import type { EventRow } from "@/lib/types";
-import { formatEventDate } from "@/lib/time";
+import { dateBadge, formatEventDate } from "@/lib/time";
 import { placeLine, withArtists } from "@/lib/event-text";
 import { Poster } from "./Poster";
 
 export function EventCard({ event, href, saved }: { event: EventRow; href?: string; saved?: boolean }) {
   const date = formatEventDate(event.starts_at, event.ends_at);
   const artists = withArtists(event);
+  const badge = dateBadge(event.starts_at);
   return (
     <Link href={href ?? `/eventos/${event.slug}`} className="event-card">
-      <Poster event={event} />
+      <div className="media">
+        <Poster event={event} />
+        {badge && <span className="datechip" aria-hidden="true"><b>{badge.day}</b><span>{badge.month}</span></span>}
+      </div>
       <div className="meta">
         <div className="row tight">
           {event.recommendation && <span className="badge gio">Recomendada por Gio</span>}

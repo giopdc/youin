@@ -54,6 +54,20 @@ export default async function Perfil({ searchParams }: { searchParams: Promise<R
       <h1>Mis planes</h1>
       <p className="muted">Hola, {profile?.full_name}. Aquí tienes tus fiestas, tus solicitudes y tus invitaciones.</p>
 
+      {participations.length > 0 && (() => {
+        const tickets = participations.reduce((n, x) => n + x.confirmed_tickets, 0);
+        const earned = participations.reduce((n, x) => n + x.earned, 0);
+        const delivered = participations.reduce((n, x) => n + x.delivered, 0);
+        return (
+          <section className="kpis" aria-label="Tus ventas como promotor">
+            <div className="kpi"><b>{tickets}</b><span>entradas vendidas con tu enlace</span></div>
+            <div className="kpi"><b>{participations.length}</b><span>{participations.length === 1 ? "fiesta" : "fiestas"} en el programa</span></div>
+            <div className="kpi"><b>{earned}</b><span>{earned === 1 ? "invitación conseguida" : "invitaciones conseguidas"}</span></div>
+            <div className="kpi"><b>{delivered}</b><span>{delivered === 1 ? "invitación entregada" : "invitaciones entregadas"}</span></div>
+          </section>
+        );
+      })()}
+
       {groups.length === 0 && (
         <div className="card empty">
           <p className="big">Aún no tienes planes</p>
@@ -117,7 +131,7 @@ function EventGroup({ g }: { g: Group }) {
       <h2><Link href={`/eventos/${event.slug}`}>{event.title}</Link></h2>
       {date && <p className="small when">{date}</p>}
       <p className="small muted">{placeLine(event)}{event.genres?.length ? ` · ${event.genres.slice(0, 3).join(", ")}` : ""}</p>
-      <p className="next-step">→ {nextStep(g)}</p>
+      <p className="next-step">{nextStep(g)}</p>
 
       {plan && !ended && (
         <div className="action stack">

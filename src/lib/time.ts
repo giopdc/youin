@@ -81,3 +81,12 @@ export function hasEnded(e: { starts_at: string | null; ends_at: string | null }
   const end = e.ends_at ? new Date(e.ends_at).getTime() : new Date(e.starts_at).getTime() + 12 * 3600_000;
   return end < now;
 }
+
+const dayFmt = new Intl.DateTimeFormat("es-ES", { timeZone: TIME_ZONE, day: "2-digit" });
+const monFmt = new Intl.DateTimeFormat("es-ES", { timeZone: TIME_ZONE, month: "short" });
+/** Bloque de fecha para tarjetas: { day: "07", month: "dic" }. */
+export function dateBadge(iso: string | null): { day: string; month: string } | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return { day: dayFmt.format(d), month: monFmt.format(d).replace(".", "") };
+}

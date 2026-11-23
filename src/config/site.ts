@@ -2,7 +2,7 @@
 // Puedes cambiarlo aquí o con la variable NEXT_PUBLIC_APP_NAME.
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || "You In";
 
-export const APP_TAGLINE = "Fiestas de música electrónica en Valencia";
+export const APP_TAGLINE = "Tu próxima noche de electrónica en Valencia, seleccionada.";
 
 export const TIME_ZONE = "Europe/Madrid";
 

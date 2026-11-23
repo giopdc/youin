@@ -90,4 +90,5 @@ update public.events set genres = '{House,"Nu-Disco / Disco","Tech house"}' wher
 update public.events set genres = '{House,"Tech house","Deep House"}' where slug in ('navidance-25-diciembre','reyes-y-reinas-5-enero');
 update public.events set genres = '{House,"Tech house",Minimal}' where slug = 'nye-31-diciembre';
 update public.events set genres = '{Techno,House,"Electrónica / Downtempo"}' where slug = 'dias-de-campo-2027';
-update public.events set status = 'draft' where slug in ('navidance-25-diciembre','nye-31-diciembre','reyes-y-reinas-5-enero','dias-de-campo-2027');
+-- Confirmadas por Giorgio: Elenco House (+21), Navidance, NYE y Días de Campo. Reyes y Reinas sigue en borrador.
+update public.events set status = 'draft' where slug = 'reyes-y-reinas-5-enero';

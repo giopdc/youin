@@ -1,5 +1,7 @@
 # You In: comunidad de eventos (MVP)
 
+Marca, voz, colores y tipografía: ver [BRAND.md](BRAND.md).
+
 Web app en español para publicar fiestas de música electrónica en Valencia, gestionar listas y
 recompensar con invitaciones a quien vende entradas con su enlace personal.
 Usa Next.js (App Router, TypeScript) y Supabase (auth, Postgres con RLS y Storage para carteles).
@@ -70,7 +72,9 @@ web. Nadie puede hacerse administrador editando su perfil.
    con autor, fecha, valor anterior, valor nuevo y nota.
 6. **Entregar invitaciones**: filtra «Invitación pendiente», escribe las instrucciones privadas (p. ej.
    cómo identificarse en puerta) y pulsa «Marcar invitación N como entregada». Se registra una sola vez.
-7. **Reembolsos**: corrige el total a la baja. Si una invitación ya entregada deja de corresponder,
+7. **Ventas por perfil**: en Admin → «Ventas por perfil» ves el total acumulado de cada persona en todas las fiestas,
+   el desglose por fiesta, las invitaciones y un CSV descargable. Cada miembro ve sus propios totales en «Mis planes».
+8. **Reembolsos**: corrige el total a la baja. Si una invitación ya entregada deja de corresponder,
    la fila aparece en «Para revisar» y el historial de entrega se conserva.
 
 Un clic en un enlace nunca suma ventas. La app no se conecta a Xceed ni necesita credenciales de Xceed:
