@@ -8,13 +8,15 @@ var COLUMNS = {
   mensajes: ["fecha", "fiesta", "fecha_fiesta", "nombre", "correo", "canal", "mensaje"],
 };
 var TABS = { lista: "Lista", mensajes: "Mensajes" };
+// Clave compartida con la web. Puedes escribirla aquí o en Configuración del proyecto → Propiedades del script (TOKEN).
+var TOKEN = "";
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
     var data = JSON.parse(e.postData.contents);
-    var expected = PropertiesService.getScriptProperties().getProperty("TOKEN");
+    var expected = TOKEN || PropertiesService.getScriptProperties().getProperty("TOKEN");
     if (!expected || data.token !== expected) return reply({ ok: false, error: "token" });
     var cols = COLUMNS[data.kind];
     if (!cols) return reply({ ok: false, error: "kind" });
