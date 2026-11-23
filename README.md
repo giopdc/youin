@@ -9,7 +9,6 @@ El nombre «Yuin» es provisional: cámbialo en `src/config/site.ts` o con `NEXT
 ## 1. Arrancar
 
 ```bash
-cd yuin
 npm install
 cp .env.example .env.local   # rellena los valores (ver abajo)
 npm run dev                  # http://localhost:3000
