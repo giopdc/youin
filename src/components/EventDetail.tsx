@@ -1,61 +1,65 @@
 import type { EventRow } from "@/lib/types";
 import { formatEventDate } from "@/lib/time";
+import { artistList } from "@/lib/event-text";
+import { Poster } from "./Poster";
 
-// Ficha pública. Los campos opcionales vacíos no se muestran.
-export function EventDetail({ event, children }: { event: EventRow; children?: React.ReactNode }) {
+// Ficha: primero la música y la recomendación, luego las acciones y por último la información práctica.
+export function EventDetail({ event, actions, extra }: { event: EventRow; actions?: React.ReactNode; extra?: React.ReactNode }) {
   const date = formatEventDate(event.starts_at, event.ends_at);
   const place = [event.venue, event.address, event.city].filter(Boolean).join(", ");
-  const artists = (event.artists ?? "").split("\n").map((a) => a.trim()).filter(Boolean);
+  const artists = artistList(event);
   return (
-    <article className="stack">
-      {event.poster_url && <img className="poster" src={event.poster_url} alt={`Cartel de ${event.title}`} />}
-      <div>
-        {event.promoter && <div className="muted">{event.promoter}</div>}
-        <h1>{event.title}</h1>
-        {date && <p style={{ fontWeight: 600 }}>{date}</p>}
-        {place && <p className="muted">{place}</p>}
+    <article className="ficha">
+      <div className="ficha-media desktop-only"><Poster event={event} size="hero" /></div>
+      <div className="ficha-body stack">
+        <header>
+          {event.promoter && <p className="kicker">{event.promoter}</p>}
+          <h1>{event.title}</h1>
+          {date && <p className="when-big">{date}</p>}
+          {place && <p className="muted">{place}</p>}
+        </header>
+
+        {(event.genres?.length > 0 || artists.length > 0) && (
+          <section className="card music" aria-labelledby="musica">
+            <h2 id="musica">Qué suena</h2>
+            {event.genres?.length > 0 && (
+              <ul className="genres">{event.genres.map((g) => <li key={g}>{g}</li>)}</ul>
+            )}
+            {artists.length > 0 && (
+              <ul className="lineup">{artists.map((a) => <li key={a}>{a}</li>)}</ul>
+            )}
+          </section>
+        )}
+
+        {event.recommendation && (
+          <aside className="gio-note" aria-label="Recomendación de Gio">
+            <p className="kicker">Gio recomienda</p>
+            <p className="pre">{event.recommendation}</p>
+          </aside>
+        )}
+
+        {actions}
+
+        <div className="mobile-only"><Poster event={event} size="hero" /></div>
+
+        {event.description && (
+          <section className="card">
+            <h2>La fiesta</h2>
+            <p className="pre" style={{ margin: 0 }}>{event.description}</p>
+          </section>
+        )}
+        {(event.price_text || event.min_age != null || event.access_conditions) && (
+          <section className="card">
+            <h2>Antes de ir</h2>
+            <dl className="facts">
+              {event.price_text && (<><dt>Precio</dt><dd className="pre">{event.price_text}</dd></>)}
+              {event.min_age != null && (<><dt>Edad mínima</dt><dd>{event.min_age} años</dd></>)}
+              {event.access_conditions && (<><dt>Acceso</dt><dd className="pre">{event.access_conditions}</dd></>)}
+            </dl>
+          </section>
+        )}
+        {extra}
       </div>
-      {children}
-      {artists.length > 0 && (
-        <section className="card">
-          <h2>Artistas</h2>
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            {artists.map((a) => (
-              <li key={a}>{a}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-      {event.description && (
-        <section className="card">
-          <h2>Información</h2>
-          <p className="pre">{event.description}</p>
-        </section>
-      )}
-      {(event.price_text || event.min_age != null || event.access_conditions) && (
-        <section className="card">
-          <dl className="facts">
-            {event.price_text && (
-              <>
-                <dt>Precio</dt>
-                <dd className="pre">{event.price_text}</dd>
-              </>
-            )}
-            {event.min_age != null && (
-              <>
-                <dt>Edad mínima</dt>
-                <dd>{event.min_age} años</dd>
-              </>
-            )}
-            {event.access_conditions && (
-              <>
-                <dt>Acceso</dt>
-                <dd className="pre">{event.access_conditions}</dd>
-              </>
-            )}
-          </dl>
-        </section>
-      )}
     </article>
   );
 }

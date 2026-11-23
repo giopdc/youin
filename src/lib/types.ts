@@ -24,6 +24,8 @@ export type EventRow = {
   rewards_conditions: string | null;
   reward_threshold: number;
   reward_cap: number | null;
+  genres: string[];
+  recommendation: string | null;
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -72,3 +74,5 @@ export type SalesAdjustment = {
 };
 
 export type Delivery = { id: string; participation_id: string; seq: number; delivered_at: string; delivered_by: string | null };
+
+export type SavedPlan = { id: string; user_id: string; event_id: string; has_ticket: boolean | null; created_at: string };

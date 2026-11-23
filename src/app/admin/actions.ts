@@ -70,6 +70,8 @@ function parseEvent(fd: FormData): Parsed {
       poster_url: on(fd, "remove_poster") ? null : posterRaw || null,
       description: opt(fd, "description"),
       artists: opt(fd, "artists"),
+      genres: str(fd, "genres").split(",").map((g) => g.trim()).filter(Boolean).slice(0, 8),
+      recommendation: opt(fd, "recommendation"),
       price_text: opt(fd, "price_text"),
       min_age,
       access_conditions: opt(fd, "access_conditions"),

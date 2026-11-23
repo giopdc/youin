@@ -256,4 +256,31 @@ update public.events set starts_at = now() - interval '2 days', ends_at = now() 
 select t.ok((select state from public.resolve_referral(t.code('ana_p'))) = 'ended',
   'fiesta terminada muestra estado');
 
+
+-- ---------------------------------------------------------------- Planes guardados
+update public.events set starts_at = now() + interval '3 days', ends_at = now() + interval '3 days 6 hours' where slug = 'prueba-elenco';
+select t.as_user('ana@example.com');
+set role authenticated;
+select public.save_plan((select v from t.ids where k = 'event'));
+select public.save_plan((select v from t.ids where k = 'event'));
+select t.ok((select count(*) from public.saved_plans) = 1, 'guardar dos veces deja un único plan');
+select t.ok((select has_ticket is null from public.saved_plans), 'el plan empieza sin contestar «¿tienes entrada?»');
+select public.set_plan_ticket((select v from t.ids where k = 'event'), true);
+select t.ok((select has_ticket from public.saved_plans), 'Ana responde que ya tiene entrada');
+select t.throws($$insert into public.saved_plans (user_id, event_id) values (auth.uid(), (select v from t.ids where k = 'event'))$$, 'permission denied', 'no se escribe la tabla directamente');
+reset role;
+select t.as_user('pablo@example.com');
+set role authenticated;
+select t.ok((select count(*) from public.saved_plans) = 0, 'Pablo no ve el plan de Ana');
+select t.throws($$select public.set_plan_ticket((select v from t.ids where k = 'event'), true)$$, 'Primero guarda', 'Pablo no cambia un plan que no tiene');
+reset role;
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.throws($$select public.save_plan((select v from t.ids where k = 'event'))$$, 'permission denied', 'sin cuenta no se guarda el plan');
+reset role;
+select t.as_user('giorgio@example.com');
+set role authenticated;
+select t.throws($$select public.save_plan((select id from public.events where slug = 'elenco-borrador'))$$, 'no está disponible', 'no se guarda un borrador');
+reset role;
+
 \echo 'TODAS LAS COMPROBACIONES DE BASE DE DATOS PASARON'

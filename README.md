@@ -88,7 +88,16 @@ Web publicada: https://you-in.ciaterbox.workers.dev
   con *Build command* `npx opennextjs-cloudflare build` y *Deploy command* `npx opennextjs-cloudflare deploy`,
   para que cada push a `main` se publique solo.
 
-## 5. Comprobaciones
+## 5. Guion de comunidad
+
+- `scripts/prueba-comunidad.md`: el guion de prueba con cinco personas.
+- `scripts/guion-comunidad.mjs`: lo recorre en un móvil simulado de 390 × 844 (pasos 1, 2, 3 y 5).
+  `BASE=https://you-in.ciaterbox.workers.dev EMAIL=… PASSWORD=… SHOTS=./capturas node scripts/guion-comunidad.mjs`
+  (la cuenta debe existir y estar confirmada; el paso 4, el programa de Elenco, lo cubren `npm run test:db` y la E2E).
+- `scripts/revisar-ficha-yuin.py URL`: comprueba la vista previa social (og:title, og:description, og:url).
+  Cloudflare bloquea el agente por defecto de Python («Python-urllib»); WhatsApp, Telegram y Facebook sí la reciben.
+
+## 6. Comprobaciones
 
 ```bash
 npm run lint        # TypeScript

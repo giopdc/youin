@@ -47,6 +47,8 @@ export function EventForm({ event, action, submitLabel }: { event?: EventRow; ac
         <Field label="Subir cartel" hint="JPG, PNG o WebP, máximo 5 MB."><input type="file" name="poster_file" accept="image/jpeg,image/png,image/webp,image/gif" /></Field>
         <Field label="…o dirección del cartel (https)"><input type="url" name="poster_url" defaultValue={event?.poster_url ?? ""} /></Field>
         <Field label="Descripción"><textarea name="description" defaultValue={event?.description ?? ""} /></Field>
+        <Field label="Estilos musicales" hint="Separados por comas. Ej.: House, Tech house, Disco"><input type="text" name="genres" defaultValue={(event?.genres ?? []).join(", ")} /></Field>
+        <Field label="Tu recomendación (Gio recomienda)" hint="Por qué merece la pena. Si la escribes, la fiesta sale destacada en la portada."><textarea name="recommendation" defaultValue={event?.recommendation ?? ""} maxLength={400} /></Field>
         <Field label="Artistas" hint="Uno por línea."><textarea name="artists" defaultValue={event?.artists ?? ""} /></Field>
         <div className="grid2">
           <Field label="Precio o texto de precios"><textarea name="price_text" defaultValue={event?.price_text ?? ""} style={{ minHeight: 60 }} /></Field>

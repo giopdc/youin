@@ -84,3 +84,10 @@ Apertura de puertas: 18:00.','https://xceed.me/es/valencia/event/dias-de-campo-2
 delete from public.events where slug = 'the-basement-borrador';
 -- El borrador de ejemplo de Elenco se sustituye por elenco-house-7-diciembre.
 delete from public.events where slug = 'elenco-borrador';
+
+-- Estilos musicales (Xceed) y estado: solo Elenco House está confirmada por Giorgio.
+update public.events set genres = '{House,"Nu-Disco / Disco","Tech house"}' where slug = 'elenco-house-7-diciembre';
+update public.events set genres = '{House,"Tech house","Deep House"}' where slug in ('navidance-25-diciembre','reyes-y-reinas-5-enero');
+update public.events set genres = '{House,"Tech house",Minimal}' where slug = 'nye-31-diciembre';
+update public.events set genres = '{Techno,House,"Electrónica / Downtempo"}' where slug = 'dias-de-campo-2027';
+update public.events set status = 'draft' where slug in ('navidance-25-diciembre','nye-31-diciembre','reyes-y-reinas-5-enero','dias-de-campo-2027');

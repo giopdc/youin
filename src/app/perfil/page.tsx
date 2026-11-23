@@ -6,24 +6,28 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { formatEventDate, formatShort, hasEnded } from "@/lib/time";
 import { computeRewards, rewardMessage } from "@/lib/rewards";
 import { siteUrl } from "@/config/site";
-import type { Delivery, EventRow, GuestlistRow, ParticipationSummary } from "@/lib/types";
-import { updateName } from "./actions";
+import { InviteFriend } from "@/components/InviteFriend";
+import { inviteText, placeLine } from "@/lib/event-text";
+import type { Delivery, EventRow, GuestlistRow, ParticipationSummary, SavedPlan } from "@/lib/types";
+import { removePlan, setTicket, updateName } from "./actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Mi perfil" };
+export const metadata = { title: "Mis planes" };
 
-type Group = { event: EventRow; request?: GuestlistRow; part?: ParticipationSummary; deliveries: Delivery[] };
+type Group = { event: EventRow; plan?: SavedPlan; request?: GuestlistRow; part?: ParticipationSummary; deliveries: Delivery[] };
 
 export default async function Perfil({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
   const sp = await searchParams;
   const { supabase, user, profile } = await requireUser("/perfil");
-  const [{ data: reqs }, { data: parts }] = await Promise.all([
+  const [{ data: reqs }, { data: parts }, { data: pls }] = await Promise.all([
     supabase.from("guestlist_requests").select("*").eq("user_id", user.id),
     supabase.from("participation_summary").select("*").eq("user_id", user.id),
+    supabase.from("saved_plans").select("*").eq("user_id", user.id),
   ]);
+  const plans = (pls ?? []) as SavedPlan[];
   const requests = (reqs ?? []) as GuestlistRow[];
   const participations = (parts ?? []) as ParticipationSummary[];
-  const eventIds = [...new Set([...requests.map((r) => r.event_id), ...participations.map((p) => p.event_id)])];
+  const eventIds = [...new Set([...plans.map((p) => p.event_id), ...requests.map((r) => r.event_id), ...participations.map((p) => p.event_id)])];
   const [{ data: evs }, { data: dels }] = await Promise.all([
     eventIds.length ? supabase.from("events").select("*").in("id", eventIds) : Promise.resolve({ data: [] }),
     participations.length
@@ -35,6 +39,7 @@ export default async function Perfil({ searchParams }: { searchParams: Promise<R
     const part = participations.find((p) => p.event_id === event.id);
     return {
       event,
+      plan: plans.find((p) => p.event_id === event.id),
       request: requests.find((r) => r.event_id === event.id),
       part,
       deliveries: part ? deliveries.filter((d) => d.participation_id === part.id).sort((a, b) => a.seq - b.seq) : [],
@@ -46,13 +51,14 @@ export default async function Perfil({ searchParams }: { searchParams: Promise<R
   return (
     <div className="wrap">
       <Flash msg={sp.msg} err={sp.err} />
-      <h1>Mi perfil</h1>
-      <p className="muted">{profile?.full_name} · {user.email}</p>
+      <h1>Mis planes</h1>
+      <p className="muted">Hola, {profile?.full_name}. Aquí tienes tus fiestas, tus solicitudes y tus invitaciones.</p>
 
       {groups.length === 0 && (
-        <div className="card">
-          <p>Todavía no te has apuntado a ninguna fiesta.</p>
-          <Link className="btn primary" href="/">Ver próximos eventos</Link>
+        <div className="card empty">
+          <p className="big">Aún no tienes planes</p>
+          <p className="muted">Busca una fiesta que te apetezca y pulsa «Guardar plan». Aparecerá aquí.</p>
+          <Link className="btn primary" href="/">Ver fiestas</Link>
         </div>
       )}
       {upcoming.map((g) => <EventGroup key={g.event.id} g={g} />)}
@@ -83,27 +89,65 @@ function byDate(a: Group, b: Group) {
 function nextStep(g: Group): string {
   if (hasEnded(g.event)) return "Fiesta terminada";
   const p = g.part;
-  if (p) {
-    if (p.pending_invitations > 0) return "Recoge tu invitación: sigue las instrucciones de entrega";
-    if (p.status === "pending") return "Espera tu enlace: aparecerá aquí cuando esté listo";
-    if (p.status === "active") return "Comparte tu enlace para sumar entradas";
-  }
+  if (p && p.pending_invitations > 0) return "Recoge tu invitación: sigue las instrucciones de entrega";
+  if (g.plan?.has_ticket === null || (g.plan && g.plan.has_ticket === undefined)) return "Cuéntanos: ¿tienes ya entrada?";
+  if (g.plan?.has_ticket === false && g.event.ticket_url) return "Consigue tu entrada antes de que suba de precio";
   if (g.request?.status === "pending") return "Espera la confirmación de la lista";
-  if (g.request?.status === "confirmed") return "Estás en la lista. ¡Nos vemos en la fiesta!";
-  if (p?.status === "inactive") return "Tu enlace está desactivado";
-  return "Consulta la ficha de la fiesta";
+  if (p?.status === "pending") return "Espera tu enlace de promotor: aparecerá aquí";
+  if (p?.status === "active") return "Comparte tu enlace de promotor para sumar entradas";
+  if (g.request?.status === "confirmed") return "Estás en la lista. ¡Nos vemos en la pista!";
+  if (g.plan?.has_ticket) return "¡Tienes entrada! ¿Le preguntas a alguien si se viene?";
+  if (p?.status === "inactive") return "Tu enlace de promotor está desactivado";
+  return "Mira la ficha y decide";
 }
 
 function EventGroup({ g }: { g: Group }) {
-  const { event, request, part } = g;
+  const { event, request, part, plan } = g;
   const ended = hasEnded(event);
   const date = formatEventDate(event.starts_at, event.ends_at);
+  const url = `${siteUrl()}/eventos/${event.slug}`;
+  const hidden = (
+    <>
+      <input type="hidden" name="event_id" value={event.id} />
+      <input type="hidden" name="slug" value={event.slug} />
+    </>
+  );
   return (
-    <section className="card" id={`e-${event.slug}`} style={{ scrollMarginTop: 72 }}>
-      <div className="small muted">{event.promoter}</div>
+    <section className="card plan-card" id={`e-${event.slug}`} style={{ scrollMarginTop: 72 }}>
       <h2><Link href={`/eventos/${event.slug}`}>{event.title}</Link></h2>
-      {date && <p className="small">{date}</p>}
+      {date && <p className="small when">{date}</p>}
+      <p className="small muted">{placeLine(event)}{event.genres?.length ? ` · ${event.genres.slice(0, 3).join(", ")}` : ""}</p>
       <p className="next-step">→ {nextStep(g)}</p>
+
+      {plan && !ended && (
+        <div className="action stack">
+          <h3>Tu plan</h3>
+          {plan.has_ticket === null ? (
+            <form action={setTicket} className="stack">
+              {hidden}
+              <p style={{ margin: 0, fontWeight: 700 }}>¿Tienes ya entrada?</p>
+              <div className="row">
+                <SubmitButton className="btn primary" name="has_ticket" value="true">Sí, ya la tengo</SubmitButton>
+                <SubmitButton className="btn" name="has_ticket" value="false">Todavía no</SubmitButton>
+              </div>
+            </form>
+          ) : plan.has_ticket ? (
+            <form action={setTicket} className="row">
+              {hidden}
+              <span className="status ok">Tienes entrada. ¡Nos vemos en la pista!</span>
+              <SubmitButton className="btn sm" name="has_ticket" value="reset">Cambiar</SubmitButton>
+            </form>
+          ) : (
+            <form action={setTicket} className="row">
+              {hidden}
+              <span className="status warn">Aún sin entrada</span>
+              {event.ticket_url && <a className="btn sm sun" href={event.ticket_url} target="_blank" rel="noopener noreferrer">Comprar entrada</a>}
+              <SubmitButton className="btn sm" name="has_ticket" value="true">Ya la tengo</SubmitButton>
+            </form>
+          )}
+          <InviteFriend url={url} title={event.title} defaultText={inviteText(event)} compact />
+        </div>
+      )}
 
       {request && (
         <div className="action">
@@ -116,6 +160,13 @@ function EventGroup({ g }: { g: Group }) {
       )}
 
       {part && <ProgramPanel g={g} ended={ended} />}
+
+      {plan && (
+        <form action={removePlan} className="action">
+          {hidden}
+          <SubmitButton className="btn sm" pendingText="Quitando…" confirm={`¿Quitar «${event.title}» de tus planes?`}>Quitar de mis planes</SubmitButton>
+        </form>
+      )}
     </section>
   );
 }
@@ -125,8 +176,10 @@ function ProgramPanel({ g, ended }: { g: Group; ended: boolean }) {
   const r = computeRewards({ confirmed: p.confirmed_tickets, threshold: p.reward_threshold, cap: p.reward_cap, delivered: p.delivered });
   const pct = r.capReached ? 100 : Math.round(((p.confirmed_tickets % p.reward_threshold) / p.reward_threshold) * 100);
   return (
-    <div className="action stack">
-      <h3>Comparte y gana</h3>
+    <div className="action stack promo-inline">
+      <p className="kicker">Programa de promotores</p>
+      <h3>Tu enlace personal de venta</h3>
+      <p className="small muted" style={{ margin: 0 }}>Este enlace cuenta en Xceed las entradas que vendes. Para invitar a un amigo usa «¿Te vienes?».</p>
       {p.status === "pending" ? (
         <p>Hemos recibido tu solicitud. Tu enlace aparecerá aquí cuando esté listo</p>
       ) : (
