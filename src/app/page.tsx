@@ -19,8 +19,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   return (
     <div className="wrap">
       <Flash msg={sp.msg} err={sp.err} />
-      <h1>Próximos eventos</h1>
-      <p className="muted">{APP_TAGLINE}</p>
+      <div className="hero">
+        <h1>Próximos eventos</h1>
+        <p>{APP_TAGLINE}</p>
+      </div>
       {events.length === 0 ? (
         <div className="card">
           <p style={{ margin: 0 }}>Pronto anunciaremos los próximos eventos</p>

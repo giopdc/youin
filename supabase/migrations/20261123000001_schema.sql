@@ -1,4 +1,4 @@
--- Esquema principal de la comunidad (Yuin, nombre provisional).
+-- Esquema principal de la comunidad (You In).
 -- Todas las tablas tienen RLS. Las escrituras sensibles pasan por funciones
 -- SECURITY DEFINER que comprueban permisos dentro de la base de datos.
 

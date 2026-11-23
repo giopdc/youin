@@ -1,10 +1,10 @@
-# Yuin: comunidad de eventos (MVP)
+# You In: comunidad de eventos (MVP)
 
 Web app en español para publicar fiestas de música electrónica en Valencia, gestionar listas y
 recompensar con invitaciones a quien vende entradas con su enlace personal.
 Usa Next.js (App Router, TypeScript) y Supabase (auth, Postgres con RLS y Storage para carteles).
 
-El nombre «Yuin» es provisional: cámbialo en `src/config/site.ts` o con `NEXT_PUBLIC_APP_NAME`.
+El nombre «You In» está definido en un solo sitio: `src/config/site.ts` (o la variable `NEXT_PUBLIC_APP_NAME`).
 
 ## 1. Arrancar
 
@@ -21,8 +21,8 @@ npm run dev                  # http://localhost:3000
    - con la CLI: `npx supabase link --project-ref <ref>` y después `npx supabase db push`;
    - o desde **SQL Editor**: pega y ejecuta cada archivo, por orden de nombre.
 3. **Authentication → URL Configuration**:
-   - Site URL: tu dominio (p. ej. `https://yuin.example`).
-   - Redirect URLs: `https://yuin.example/auth/confirm` (y `http://localhost:3000/auth/confirm` para desarrollo).
+   - Site URL: tu dominio (p. ej. `https://youin.example`).
+   - Redirect URLs: `https://youin.example/auth/confirm` (y `http://localhost:3000/auth/confirm` para desarrollo).
 4. **Authentication → Email Templates** (recomendado: el enlace funcionará aunque el correo se abra en otro navegador):
    - *Confirm signup*: `<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email">Confirmar mi cuenta</a>`
    - *Reset password*: `<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery">Elegir contraseña nueva</a>`

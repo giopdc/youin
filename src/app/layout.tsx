@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: APP_TAGLINE,
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0e0e10" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#5b2bd9" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { user, isAdmin } = await getSession();

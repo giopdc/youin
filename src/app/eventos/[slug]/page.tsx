@@ -71,7 +71,7 @@ export default async function EventPage({ params, searchParams }: Props) {
             {event.ticket_url && (
               <div className="action">
                 <h2>Entradas</h2>
-                <a className="btn primary block" href={event.ticket_url} target="_blank" rel="noopener noreferrer">
+                <a className="btn sun block" href={event.ticket_url} target="_blank" rel="noopener noreferrer">
                   Comprar entrada
                 </a>
                 <p className="small muted" style={{ marginTop: 6 }}>La compra se realiza en Xceed.</p>

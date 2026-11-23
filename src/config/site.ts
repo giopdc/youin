@@ -1,6 +1,6 @@
 // Único sitio donde se define el nombre de la comunidad.
 // Puedes cambiarlo aquí o con la variable NEXT_PUBLIC_APP_NAME.
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || "Yuin";
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME?.trim() || "You In";
 
 export const APP_TAGLINE = "Fiestas de música electrónica en Valencia";
 
