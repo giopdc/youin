@@ -1,8 +1,5 @@
-/**
- * You In → Google Sheets
- * Pega este código en Extensiones → Apps Script de tu hoja y sigue los pasos del README (sección Google Sheets).
- * Crea (si no existen) dos pestañas: «Lista» y «Mensajes», y añade una fila por cada envío.
- */
+// You In → Google Sheets. Pega este código en Extensiones → Apps Script de la hoja.
+// Añade una fila en la pestaña «Lista» o «Mensajes» por cada envío de la web.
 var COLUMNS = {
   lista: ["fecha", "fiesta", "fecha_fiesta", "nombre", "correo", "telefono", "acepta_contacto", "estado", "ventaja"],
   mensajes: ["fecha", "fiesta", "fecha_fiesta", "nombre", "correo", "canal", "mensaje"],
