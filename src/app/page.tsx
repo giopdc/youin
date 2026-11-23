@@ -2,7 +2,9 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { EventCard } from "@/components/EventCard";
 import { Flash } from "@/components/Flash";
-import { hasEnded } from "@/lib/time";
+import { Poster } from "@/components/Poster";
+import { Countdown } from "@/components/Countdown";
+import { formatEventDate, hasEnded } from "@/lib/time";
 import type { EventRow } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -13,14 +15,23 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const { data } = await supabase.from("events").select("*").eq("status", "published").order("starts_at", { ascending: true });
   const upcoming = ((data ?? []) as EventRow[]).filter((e) => !hasEnded(e));
   const saved = new Set<string>();
+  const joined = new Set<string>();
   if (user) {
-    const { data: plans } = await supabase.from("saved_plans").select("event_id").eq("user_id", user.id);
+    const [{ data: plans }, { data: lists }] = await Promise.all([
+      supabase.from("saved_plans").select("event_id").eq("user_id", user.id),
+      supabase.from("guestlist_requests").select("event_id").eq("user_id", user.id),
+    ]);
     (plans ?? []).forEach((p: { event_id: string }) => saved.add(p.event_id));
+    (lists ?? []).forEach((p: { event_id: string }) => joined.add(p.event_id));
   }
-  const genres = [...new Set(upcoming.flatMap((e) => e.genres ?? []))].sort((a, b) => a.localeCompare(b, "es"));
-  const musica = sp.musica && genres.includes(sp.musica) ? sp.musica : null;
-  const list = musica ? upcoming.filter((e) => e.genres?.includes(musica)) : upcoming;
-  const picks = musica ? [] : upcoming.filter((e) => e.recommendation);
+  // La fiesta con lista abierta más próxima es la protagonista.
+  const featured = upcoming.find((e) => e.guestlist_enabled && e.guestlist_open && e.guestlist_perk);
+  let count = 0;
+  if (featured) {
+    const { data: c } = await supabase.rpc("guestlist_count", { p_event: featured.id });
+    count = typeof c === "number" ? c : 0;
+  }
+  const rest = upcoming.filter((e) => e.id !== featured?.id);
 
   return (
     <div className="wrap wide">
@@ -28,7 +39,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       <section className="hero">
         <span className="sticker">¿you in?</span>
         <h1>Tu próxima noche, <span className="accent">seleccionada</span>.</h1>
-        <p>La agenda de música electrónica de Valencia que recomienda Gio. Mira qué suena, guarda tu plan y pregunta a quien quieras si se viene.</p>
+        <p>La agenda de música electrónica de Valencia. Apúntate a la lista, guarda tu plan y pregunta a quien quieras: ¿te vienes?</p>
       </section>
 
       {upcoming.length === 0 ? (
@@ -38,45 +49,34 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         </div>
       ) : (
         <>
-          <ul className="paths" aria-label="Por dónde empezar">
-            <li><strong>¿Primera vez?</strong> Empieza por las fiestas que recomienda Gio.</li>
-            <li><strong>¿Ya conoces la escena?</strong> Filtra por el sonido que buscas.</li>
-            <li><strong>¿Vas con gente?</strong> En cada fiesta, «¿Te vienes?» se la manda a quien quieras.</li>
-          </ul>
-
-          {picks.length > 0 && (
-            <section aria-labelledby="gio">
-              <h2 id="gio" className="section-title">Gio recomienda</h2>
-              <div className="picks">
-                {picks.map((e) => (
-                  <Link key={e.id} href={`/eventos/${e.slug}`} className="pick">
-                    <span className="pick-title">{e.title}</span>
-                    <span className="pick-quote">«{e.recommendation}»</span>
-                  </Link>
-                ))}
+          {featured && (
+            <section className="featured" aria-labelledby="destacada">
+              <Link href={`/eventos/${featured.slug}`} className="featured-media" tabIndex={-1} aria-hidden="true">
+                <Poster event={featured} />
+              </Link>
+              <div className="featured-body">
+                <p className="kicker">Lista abierta</p>
+                <h2 id="destacada" className="featured-perk">{featured.guestlist_perk}</h2>
+                <p className="featured-title"><Link href={`/eventos/${featured.slug}`}>{featured.title}</Link></p>
+                <p className="when">{formatEventDate(featured.starts_at, featured.ends_at)} · {featured.venue}</p>
+                {featured.starts_at && <Countdown to={featured.starts_at} label="Empieza en" />}
+                <p className="hook-count">{count > 0 ? <><b>{count}</b> {count === 1 ? "persona ya está apuntada" : "personas ya están apuntadas"}</> : "Sé de los primeros en apuntarte"}</p>
+                {joined.has(featured.id) ? (
+                  <Link className="btn primary big" href={`/eventos/${featured.slug}#lista`}>Ya estás dentro · invita a alguien</Link>
+                ) : (
+                  <Link className="btn invite big" href={`/eventos/${featured.slug}?lista=1#lista`}>Apúntame gratis</Link>
+                )}
               </div>
             </section>
           )}
 
-          {genres.length > 1 && (
-            <nav className="tabs" aria-label="Filtrar por música">
-              <Link href="/" aria-current={!musica ? "page" : undefined}>Toda la música</Link>
-              {genres.map((g) => (
-                <Link key={g} href={`/?musica=${encodeURIComponent(g)}`} aria-current={musica === g ? "page" : undefined}>{g}</Link>
-              ))}
-            </nav>
-          )}
-
-          <h2 className="section-title">{musica ? `Fiestas con ${musica}` : "Próximas fiestas"}</h2>
-          {list.length === 0 ? (
-            <div className="card empty">
-              <p>Ahora mismo no hay fiestas de {musica}.</p>
-              <Link className="btn" href="/">Ver toda la música</Link>
-            </div>
-          ) : (
-            <div className="grid">
-              {list.map((e) => <EventCard key={e.id} event={e} saved={saved.has(e.id)} />)}
-            </div>
+          {rest.length > 0 && (
+            <>
+              <h2 className="section-title">{featured ? "Más noches" : "Próximas fiestas"}</h2>
+              <div className="grid">
+                {rest.map((e) => <EventCard key={e.id} event={e} saved={saved.has(e.id)} />)}
+              </div>
+            </>
           )}
         </>
       )}

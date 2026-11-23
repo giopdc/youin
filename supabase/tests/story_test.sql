@@ -115,7 +115,7 @@ reset role;
 select t.as_user('pablo@example.com');
 set role authenticated;
 select public.join_program((select v from t.ids where k = 'event'));
-select public.request_guestlist((select v from t.ids where k = 'event'));
+select public.request_guestlist((select v from t.ids where k = 'event'), '+34 600 000 001', true);
 insert into t.ids select 'pablo_p', id from public.participations;
 select t.ok((select count(*) from public.participations) = 1, 'Pablo solo ve su participación');
 select t.ok((select count(*) from public.participation_summary) = 1, 'Pablo solo ve su resumen');
@@ -233,7 +233,7 @@ select t.ok((select confirmed_tickets = 2 and status = 'active' from public.part
 
 select t.as_user('carla@example.com');
 set role authenticated;
-select public.request_guestlist((select v from t.ids where k = 'event'));
+select public.request_guestlist((select v from t.ids where k = 'event'), '+34 600 000 001', true);
 select t.ok((select count(*) from public.participations) = 0, 'apuntarse a la lista no inscribe como promotora');
 reset role;
 
@@ -242,7 +242,7 @@ update public.events set guestlist_open = false, rewards_open = false where slug
 select t.as_user('giorgio@example.com');
 set role authenticated;
 select t.throws($$select public.join_program((select v from t.ids where k = 'event'))$$, 'cerrado', 'programa cerrado');
-select t.throws($$select public.request_guestlist((select v from t.ids where k = 'event'))$$, 'cerrada', 'lista cerrada');
+select t.throws($$select public.request_guestlist((select v from t.ids where k = 'event'), '600000002')$$, 'cerrada', 'lista cerrada');
 reset role;
 
 -- Desactivar el enlace y fiesta terminada
@@ -296,6 +296,43 @@ select t.ok((select count(*) from public.promoter_totals) = 1, 'Pablo solo ve su
 reset role;
 set role anon;
 select t.throws('select * from public.promoter_totals', 'permission denied', 'sin cuenta no se ven totales');
+reset role;
+
+
+-- ---------------------------------------------------------------- Lista con ventaja y autoconfirmación
+update public.events set guestlist_open = true, guestlist_auto_confirm = true, guestlist_perk = 'Gratis hasta las 21:30',
+  starts_at = now() + interval '3 days', ends_at = now() + interval '3 days 6 hours' where slug = 'prueba-elenco';
+select t.as_user('ana@example.com');
+set role authenticated;
+select t.throws($$select public.request_guestlist((select v from t.ids where k = 'event'))$$, 'teléfono', 'la lista pide teléfono');
+select t.throws($$select public.request_guestlist((select v from t.ids where k = 'event'), 'abc')$$, 'teléfono', 'teléfono no válido');
+select public.request_guestlist((select v from t.ids where k = 'event'), '+34 611 22 33 44', false);
+select public.request_guestlist((select v from t.ids where k = 'event'), '+34 611 22 33 44', true);
+select t.ok((select count(*) from public.guestlist_requests) = 1, 'apuntarse dos veces deja una solicitud');
+select t.ok((select status = 'confirmed' and reviewed_at is not null and phone = '+34 611 22 33 44' and contact_consent from public.guestlist_requests),
+  'con autoconfirmación queda confirmada al momento, con teléfono y consentimiento');
+-- Invitaciones enviadas
+select public.log_invite((select v from t.ids where k = 'event'), 'whatsapp', '¿Te vienes el lunes?');
+select public.log_invite((select v from t.ids where k = 'event'), 'copy', null);
+select t.ok((select count(*) from public.invite_logs) = 2, 'Ana ve sus 2 invitaciones registradas');
+select t.throws($$select public.log_invite((select v from t.ids where k = 'event'), 'sms', 'x')$$, 'Canal no válido', 'canal no válido');
+select t.throws($$insert into public.invite_logs (event_id, user_id, channel) values ((select v from t.ids where k = 'event'), auth.uid(), 'copy')$$, 'permission denied', 'no se escribe la tabla de invitaciones directamente');
+reset role;
+select t.as_user('pablo@example.com');
+set role authenticated;
+select t.ok((select count(*) from public.invite_logs) = 0, 'Pablo no ve las invitaciones de Ana');
+reset role;
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.throws($$select public.log_invite((select v from t.ids where k = 'event'), 'copy', 'x')$$, 'permission denied', 'sin cuenta no se registran invitaciones');
+reset role;
+select t.as_user('giorgio@example.com');
+set role authenticated;
+select t.ok((select count(*) from public.invite_logs) = 2, 'el admin ve todas las invitaciones');
+reset role;
+set role anon;
+select set_config('request.jwt.claims', '', false);
+select t.ok(public.guestlist_count((select v from t.ids where k = 'event')) = 3, 'el contador público da el número de apuntados');
 reset role;
 
 \echo 'TODAS LAS COMPROBACIONES DE BASE DE DATOS PASARON'

@@ -3,8 +3,8 @@ import { formatEventDate } from "@/lib/time";
 import { artistList } from "@/lib/event-text";
 import { Poster } from "./Poster";
 
-// Ficha: primero la música y la recomendación, luego las acciones y por último la información práctica.
-export function EventDetail({ event, actions, extra }: { event: EventRow; actions?: React.ReactNode; extra?: React.ReactNode }) {
+// Ficha: cabecera, gancho de la lista, line-up y acciones; después la información práctica.
+export function EventDetail({ event, top, actions, extra }: { event: EventRow; top?: React.ReactNode; actions?: React.ReactNode; extra?: React.ReactNode }) {
   const date = formatEventDate(event.starts_at, event.ends_at);
   const place = [event.venue, event.address, event.city].filter(Boolean).join(", ");
   const artists = artistList(event);
@@ -19,21 +19,18 @@ export function EventDetail({ event, actions, extra }: { event: EventRow; action
           {place && <p className="muted">{place}</p>}
         </header>
 
-        {(event.genres?.length > 0 || artists.length > 0) && (
-          <section className="card music" aria-labelledby="musica">
-            <h2 id="musica">Qué suena</h2>
-            {event.genres?.length > 0 && (
-              <ul className="genres">{event.genres.map((g) => <li key={g}>{g}</li>)}</ul>
-            )}
-            {artists.length > 0 && (
-              <ul className="lineup">{artists.map((a) => <li key={a}>{a}</li>)}</ul>
-            )}
+        {top}
+
+        {artists.length > 0 && (
+          <section className="card music" aria-labelledby="lineup">
+            <h2 id="lineup">Line-up</h2>
+            <ul className="lineup">{artists.map((a) => <li key={a}>{a}</li>)}</ul>
           </section>
         )}
 
         {event.recommendation && (
-          <aside className="gio-note" aria-label="Recomendación de Gio">
-            <p className="kicker">Gio recomienda</p>
+          <aside className="gio-note" aria-label="Por qué ir">
+            <p className="kicker">Por qué ir</p>
             <p className="pre">{event.recommendation}</p>
           </aside>
         )}

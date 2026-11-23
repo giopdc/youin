@@ -8,6 +8,7 @@ export function EventCard({ event, href, saved }: { event: EventRow; href?: stri
   const date = formatEventDate(event.starts_at, event.ends_at);
   const artists = withArtists(event);
   const badge = dateBadge(event.starts_at);
+  const perk = event.guestlist_enabled && event.guestlist_open && event.guestlist_perk;
   return (
     <Link href={href ?? `/eventos/${event.slug}`} className="event-card">
       <div className="media">
@@ -16,15 +17,11 @@ export function EventCard({ event, href, saved }: { event: EventRow; href?: stri
       </div>
       <div className="meta">
         <div className="row tight">
-          {event.recommendation && <span className="badge gio">Recomendada por Gio</span>}
+          {perk && <span className="badge perk">Lista: {perk.toLowerCase()}</span>}
           {saved && <span className="badge saved">En tus planes</span>}
+          {!perk && !saved && event.recommendation && <span className="badge gio">Recomendada</span>}
         </div>
         <h2>{event.title}</h2>
-        {event.genres?.length > 0 && (
-          <ul className="genres" aria-label="Música">
-            {event.genres.slice(0, 3).map((g) => <li key={g}>{g}</li>)}
-          </ul>
-        )}
         {artists && <p className="artists">con {artists}</p>}
         {date && <p className="small when">{date}</p>}
         <p className="small muted">{placeLine(event)}</p>

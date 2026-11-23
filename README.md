@@ -80,7 +80,21 @@ web. Nadie puede hacerse administrador editando su perfil.
 Un clic en un enlace nunca suma ventas. La app no se conecta a Xceed ni necesita credenciales de Xceed:
 solo guarda y valida destinos `https://…xceed.me/…`.
 
-## 4. Publicación (Cloudflare Workers)
+## 4. Google Sheets (lista y mensajes)
+
+Cada persona que se apunta a una lista y cada invitación «¿Te vienes?» enviada con sesión iniciada se añade como fila a una hoja de Google
+(pestañas «Lista» y «Mensajes»). Si la hoja no está configurada o falla, la web sigue funcionando y todo queda en Supabase
+(Admin → Lista → «Descargar CSV» y Admin → «Invitaciones enviadas»).
+
+1. Crea una hoja de cálculo en Google Drive.
+2. Extensiones → Apps Script. Borra el contenido y pega `google-sheets/Code.gs`. Guarda.
+3. En Apps Script: ⚙️ Configuración del proyecto → Propiedades del script → añade `TOKEN` con una clave larga inventada.
+4. Implementar → Nueva implementación → Tipo «Aplicación web» → Ejecutar como «Yo» → Quién tiene acceso «Cualquier usuario» → Implementar.
+   Autoriza el acceso y copia la URL que termina en `/exec`.
+5. Guarda en Cloudflare (Workers → `you-in` → Settings → Variables and Secrets) dos secretos:
+   `GOOGLE_SHEETS_WEBHOOK_URL` (la URL `/exec`) y `GOOGLE_SHEETS_TOKEN` (la misma clave del paso 3).
+
+## 5. Publicación (Cloudflare Workers)
 
 Web publicada: https://you-in.ciaterbox.workers.dev
 
@@ -92,7 +106,7 @@ Web publicada: https://you-in.ciaterbox.workers.dev
   con *Build command* `npx opennextjs-cloudflare build` y *Deploy command* `npx opennextjs-cloudflare deploy`,
   para que cada push a `main` se publique solo.
 
-## 5. Guion de comunidad
+## 6. Guion de comunidad
 
 - `scripts/prueba-comunidad.md`: el guion de prueba con cinco personas.
 - `scripts/guion-comunidad.mjs`: lo recorre en un móvil simulado de 390 × 844 (pasos 1, 2, 3 y 5).
@@ -101,7 +115,7 @@ Web publicada: https://you-in.ciaterbox.workers.dev
 - `scripts/revisar-ficha-yuin.py URL`: comprueba la vista previa social (og:title, og:description, og:url).
   Cloudflare bloquea el agente por defecto de Python («Python-urllib»); WhatsApp, Telegram y Facebook sí la reciben.
 
-## 6. Comprobaciones
+## 7. Comprobaciones
 
 ```bash
 npm run lint        # TypeScript

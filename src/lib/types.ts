@@ -19,6 +19,8 @@ export type EventRow = {
   guestlist_enabled: boolean;
   guestlist_open: boolean;
   guestlist_conditions: string | null;
+  guestlist_perk: string | null;
+  guestlist_auto_confirm: boolean;
   rewards_enabled: boolean;
   rewards_open: boolean;
   rewards_conditions: string | null;
@@ -38,6 +40,8 @@ export type GuestlistRow = {
   status: "pending" | "confirmed" | "rejected";
   reviewed_at: string | null;
   created_at: string;
+  phone: string | null;
+  contact_consent: boolean;
 };
 
 export type ParticipationSummary = {

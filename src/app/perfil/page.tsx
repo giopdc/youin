@@ -7,7 +7,7 @@ import { formatEventDate, formatShort, hasEnded } from "@/lib/time";
 import { computeRewards, rewardMessage } from "@/lib/rewards";
 import { siteUrl } from "@/config/site";
 import { InviteFriend } from "@/components/InviteFriend";
-import { inviteText, placeLine } from "@/lib/event-text";
+import { invitePresets, inviteText, placeLine } from "@/lib/event-text";
 import type { Delivery, EventRow, GuestlistRow, ParticipationSummary, SavedPlan } from "@/lib/types";
 import { removePlan, setTicket, updateName } from "./actions";
 
@@ -109,7 +109,7 @@ function nextStep(g: Group): string {
   if (g.request?.status === "pending") return "Espera la confirmación de la lista";
   if (p?.status === "pending") return "Espera tu enlace de promotor: aparecerá aquí";
   if (p?.status === "active") return "Comparte tu enlace de promotor para sumar entradas";
-  if (g.request?.status === "confirmed") return "Estás en la lista. ¡Nos vemos en la pista!";
+  if (g.request?.status === "confirmed") return "Estás en la lista. Invita a alguien y nos vemos en la pista";
   if (g.plan?.has_ticket) return "¡Tienes entrada! ¿Le preguntas a alguien si se viene?";
   if (p?.status === "inactive") return "Tu enlace de promotor está desactivado";
   return "Mira la ficha y decide";
@@ -130,7 +130,7 @@ function EventGroup({ g }: { g: Group }) {
     <section className="card plan-card" id={`e-${event.slug}`} style={{ scrollMarginTop: 72 }}>
       <h2><Link href={`/eventos/${event.slug}`}>{event.title}</Link></h2>
       {date && <p className="small when">{date}</p>}
-      <p className="small muted">{placeLine(event)}{event.genres?.length ? ` · ${event.genres.slice(0, 3).join(", ")}` : ""}</p>
+      <p className="small muted">{placeLine(event)}</p>
       <p className="next-step">{nextStep(g)}</p>
 
       {plan && !ended && (
@@ -159,7 +159,7 @@ function EventGroup({ g }: { g: Group }) {
               <SubmitButton className="btn sm" name="has_ticket" value="true">Ya la tengo</SubmitButton>
             </form>
           )}
-          <InviteFriend url={url} title={event.title} defaultText={inviteText(event)} compact />
+          <InviteFriend url={url} title={event.title} defaultText={inviteText(event)} presets={invitePresets(event)} compact eventId={event.id} loggedIn />
         </div>
       )}
 
@@ -167,9 +167,10 @@ function EventGroup({ g }: { g: Group }) {
         <div className="action">
           <h3>Lista</h3>
           {request.status === "pending" && <span className="status warn">Solicitud recibida</span>}
-          {request.status === "confirmed" && <span className="status ok">Estás en la lista</span>}
+          {request.status === "confirmed" && <span className="status ok">Estás en la lista{event.guestlist_perk ? ` · ${event.guestlist_perk.toLowerCase()}` : ""}</span>}
           {request.status === "rejected" && <span className="status danger">Solicitud no aceptada</span>}
           {event.guestlist_conditions && <p className="small pre muted" style={{ marginTop: 8 }}>{event.guestlist_conditions}</p>}
+          {!ended && event.starts_at && <p style={{ marginTop: 8, marginBottom: 0 }}><a className="btn sm" href={`/eventos/${event.slug}/calendario`}>Añadir al calendario</a></p>}
         </div>
       )}
 

@@ -47,8 +47,7 @@ export function EventForm({ event, action, submitLabel }: { event?: EventRow; ac
         <Field label="Subir cartel" hint="JPG, PNG o WebP, máximo 5 MB."><input type="file" name="poster_file" accept="image/jpeg,image/png,image/webp,image/gif" /></Field>
         <Field label="…o dirección del cartel (https)"><input type="url" name="poster_url" defaultValue={event?.poster_url ?? ""} /></Field>
         <Field label="Descripción"><textarea name="description" defaultValue={event?.description ?? ""} /></Field>
-        <Field label="Estilos musicales" hint="Separados por comas. Ej.: House, Tech house, Disco"><input type="text" name="genres" defaultValue={(event?.genres ?? []).join(", ")} /></Field>
-        <Field label="Tu recomendación (Gio recomienda)" hint="Por qué merece la pena. Si la escribes, la fiesta sale destacada en la portada."><textarea name="recommendation" defaultValue={event?.recommendation ?? ""} maxLength={400} /></Field>
+        <Field label="Por qué ir (opcional)" hint="Una frase que anime a venir. Sale en la ficha y marca la fiesta como «Recomendada»."><textarea name="recommendation" defaultValue={event?.recommendation ?? ""} maxLength={400} /></Field>
         <Field label="Artistas" hint="Uno por línea."><textarea name="artists" defaultValue={event?.artists ?? ""} /></Field>
         <div className="grid2">
           <Field label="Precio o texto de precios"><textarea name="price_text" defaultValue={event?.price_text ?? ""} style={{ minHeight: 60 }} /></Field>
@@ -68,6 +67,8 @@ export function EventForm({ event, action, submitLabel }: { event?: EventRow; ac
         <legend>Lista</legend>
         <label className="check"><input type="checkbox" name="guestlist_enabled" defaultChecked={event?.guestlist_enabled ?? false} /> Mostrar «Apuntarme a la lista»</label>
         <label className="check"><input type="checkbox" name="guestlist_open" defaultChecked={event?.guestlist_open ?? true} /> Lista abierta a nuevas solicitudes</label>
+        <label className="check"><input type="checkbox" name="guestlist_auto_confirm" defaultChecked={event?.guestlist_auto_confirm ?? false} /> Confirmar al momento (sin revisar una a una)</label>
+        <Field label="Ventaja de la lista" hint="Corta y clara. Sale en grande en portada y ficha. Ej.: Gratis hasta las 21:30"><input type="text" name="guestlist_perk" maxLength={80} defaultValue={event?.guestlist_perk ?? ""} /></Field>
         <Field label="Condiciones de la lista" hint="Se muestran junto al botón."><textarea name="guestlist_conditions" defaultValue={event?.guestlist_conditions ?? ""} /></Field>
       </fieldset>
 

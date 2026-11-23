@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeNext } from "@/lib/nav";
 import { siteUrl } from "@/config/site";
+import { completePendingList } from "@/lib/list";
 
 export type FormState = { error?: string; ok?: string; values?: Record<string, string> };
 
@@ -47,6 +48,7 @@ export async function signIn(_: FormState, formData: FormData): Promise<FormStat
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: authError(error.message), values: { email } };
+  await completePendingList(supabase);
   redirect(next);
 }
 

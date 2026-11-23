@@ -60,6 +60,7 @@ export default async function GuestList({ params, searchParams }: Props) {
         <input type="search" name="q" defaultValue={sp.q} placeholder="Buscar por nombre o correo" aria-label="Buscar" style={{ flex: 1, minWidth: 180 }} />
         {f !== "all" && <input type="hidden" name="f" value={f} />}
         <button className="btn" type="submit">Buscar</button>
+        <a className="btn" href={`/admin/eventos/${id}/lista/csv`} download>Descargar CSV</a>
       </form>
       <nav className="tabs" aria-label="Filtrar">
         {(["all", "pending", "confirmed", "rejected"] as const).map((k) => (
@@ -74,7 +75,8 @@ export default async function GuestList({ params, searchParams }: Props) {
           <div className="row" style={{ justifyContent: "space-between" }}>
             <div>
               <strong>{p?.full_name ?? "—"}</strong>
-              <div className="small muted">{p?.email} · {formatShort(r.created_at)}</div>
+              <div className="small muted">{p?.email}{r.phone ? ` · ${r.phone}` : ""} · {formatShort(r.created_at)}</div>
+              {r.contact_consent && <div className="small">Acepta que le avisemos por WhatsApp</div>}
             </div>
             <span className={`status ${CLS[r.status]}`}>{LABEL[r.status]}</span>
           </div>
