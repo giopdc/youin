@@ -9,6 +9,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { InviteFriend } from "@/components/InviteFriend";
 import { AutoSavePlan } from "@/components/AutoSavePlan";
 import { Countdown } from "@/components/Countdown";
+import { Crowd } from "@/components/Crowd";
 import { ListJoin } from "@/components/ListJoin";
 import { StickyJoin } from "@/components/StickyJoin";
 import { Confetti } from "@/components/Confetti";
@@ -111,9 +112,7 @@ export default async function EventPage({ params, searchParams }: Props) {
           <p className="kicker">Lista</p>
           <h2 id="h-lista" className="hook-title">{event.guestlist_perk ?? "Apúntate a la lista"}</h2>
           {event.starts_at && <Countdown to={event.starts_at} label="La fiesta empieza en" />}
-          <p className="hook-count">
-            {count > 0 ? <><b>{count}</b> {count === 1 ? "persona ya está apuntada" : "personas ya están apuntadas"}</> : <>Sé de los primeros en apuntarte</>}
-          </p>
+          <Crowd count={count} />
           {event.guestlist_conditions && <p className="small pre muted">{event.guestlist_conditions}</p>}
           <ListJoin slug={slug} loggedIn={Boolean(user)} perk={event.guestlist_perk} />
         </>

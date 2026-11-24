@@ -10,7 +10,7 @@ pocas fiestas, bien elegidas, y una forma sencilla de decir «yo voy» y de llev
 
 ## Personalidad
 Cuidada como una marca de diseño, cercana como un amigo que te pasa el plan.
-**Seria en lo práctico** (fechas, precios, entradas, ventas) y **divertida en los detalles** (pegatinas, una palabra en cursiva, el «?» del logo).
+**Seria en lo práctico** (fechas, precios, entradas, ventas) y **cercana en los detalles** (pegatinas, puntos de color, el «?» de «¿te vienes?»).
 
 | Somos | No somos |
 |---|---|
@@ -26,7 +26,7 @@ Cuidada como una marca de diseño, cercana como un amigo que te pasa el plan.
 - El enlace de promotor se nombra siempre como tal: «tu enlace personal de venta». Invitar a un amigo es otra cosa.
 
 ## Logotipo
-Palabra «You In» en Bricolage Grotesque 800 seguida de un punto ácido (●). Sobre papel, en tinta.
+Palabra «YOU IN» en Outfit 600, en mayúsculas espaciadas, seguida de un punto ácido (●). Sobre papel, en tinta.
 El nombre se cambia en `src/config/site.ts`; el punto acompaña siempre al nombre.
 
 ## Color
@@ -44,19 +44,20 @@ El nombre se cambia en `src/config/site.ts`; el punto acompaña siempre al nombr
 El ácido y el coral nunca van juntos en el mismo botón. Texto siempre en tinta sobre ácido, lila y coral.
 
 ## Tipografía
-- **Bricolage Grotesque** (variable): titulares, logotipo, números de fecha. Pesos 700–800, interlineado ajustado.
-- **Inter** (variable): interfaz y texto. 400 / 600 / 700.
-- **Instrument Serif cursiva**: una palabra de acento por titular («*seleccionada*», «*¿te vienes?*»). Nunca en párrafos.
+Solo dos familias, simples y cercanas, porque somos una comunidad que une:
 
-Las fuentes se sirven desde `public/fonts` (licencia OFL, subconjunto latino).
+- **Outfit** (títulos): redonda, clara y amable. Nombres de fiesta, salas y logotipo en **MAYÚSCULAS** con espaciado (+5 a +8 %), peso 600. Frases destacadas («Gratis hasta las 21:30») en minúsculas, peso 500.
+- **DM Sans** (texto): suave y muy legible en el móvil. Párrafos, botones, etiquetas y datos. Pesos 400 / 500 / 600.
+
+Sin cursivas decorativas ni terceras fuentes. Ambas se sirven desde `public/fonts` (licencia OFL, subconjunto latino).
 
 ## Componentes
 - **Botones en píldora.** Principal: tinta con texto blanco. Invitar: ácido. Comprar: coral. Secundario: blanco con borde de tinta.
 - **Tarjeta de fiesta.** Cartel cuadrado con esquinas de 18 px, fecha en bloque («07 DIC»), pegatina de la lista y «con …» para los artistas.
 - **Pegatinas.** Etiquetas ligeramente giradas (−2°): «Lista: gratis hasta…», «En tus planes», «Recomendada». Máximo una por tarjeta.
 - **Entrada (ticket).** «Tu plan» lleva un borde perforado superior: es lo que te llevas.
-- **Sin cartel.** Bloque lila con el nombre de la fiesta en cursiva, nunca un hueco vacío.
-- **Lista por impulso.** La ventaja de la lista en grande, cuenta atrás en directo, número de apuntados, un solo formulario y un pase «Estás dentro» con confeti al terminar.
+- **Sin cartel.** Bloque lila con el nombre de la fiesta en mayúsculas, nunca un hueco vacío.
+- **Lista por impulso.** La ventaja de la lista en grande, cuenta atrás en directo, «N personas ya se han apuntado» con puntos de color, un solo formulario y un pase «Estás dentro» con confeti al terminar.
 - **Invitar.** Mensajes rápidos para elegir con un toque y contador de invitaciones enviadas.
 - **Sin nombres propios del equipo.** La marca habla en nombre de You In, nunca de una persona.
 

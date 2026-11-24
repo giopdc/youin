@@ -4,6 +4,7 @@ import { EventCard } from "@/components/EventCard";
 import { Flash } from "@/components/Flash";
 import { Poster } from "@/components/Poster";
 import { Countdown } from "@/components/Countdown";
+import { Crowd } from "@/components/Crowd";
 import { formatEventDate, hasEnded } from "@/lib/time";
 import type { EventRow } from "@/lib/types";
 
@@ -60,7 +61,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 <p className="featured-title"><Link href={`/eventos/${featured.slug}`}>{featured.title}</Link></p>
                 <p className="when">{formatEventDate(featured.starts_at, featured.ends_at)} · {featured.venue}</p>
                 {featured.starts_at && <Countdown to={featured.starts_at} label="Empieza en" />}
-                <p className="hook-count">{count > 0 ? <><b>{count}</b> {count === 1 ? "persona ya está apuntada" : "personas ya están apuntadas"}</> : "Sé de los primeros en apuntarte"}</p>
+                <Crowd count={count} />
                 {joined.has(featured.id) ? (
                   <Link className="btn primary big" href={`/eventos/${featured.slug}#lista`}>Ya estás dentro · invita a alguien</Link>
                 ) : (
